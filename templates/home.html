@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+
+<header style="color: black;font-size: 65px;">Welcome to elearning program</header>
+<div>
+    <a href="{{url_for('register')}}">SINGUP</a>
+    <a style="float: right; padding-right: 1200px;" href="{{url_for('login')}}">LOGIN</a>
+</div>
+<img src="{{url_for('static', filename='home.jpg')}}" />
+<ul style="float: right;padding-right: 50px;">
+    <h3>About</h3>
+    <li>
+        <p>we help students to revise their notes</p>
+        <p>by giving them question and answer</p>
+    </li>
+    <li>
+        <p>this program mostly help students who</p>
+        <p>are in  O'Level (secondary)</p>
+    </li>
+    <li>
+        <p>we also show you, your improvement by</p>
+        <p>giving you marks </p>
+    </li>
+    <img style="width: 300px;height: 150px;" src="{{url_for('static', filename='site.jpg')}}" />
+</ul>
+<p style="float: right;">online elearning.</p>
+{% endblock %}

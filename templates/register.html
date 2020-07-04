@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+
+{% block head %}
+<style>
+    fieldset{
+        margin: 0 auto;
+        width: 14px;
+    }
+    .sub{
+        padding-left: 525px;
+    }
+    .info{
+        text-align: center;
+    }
+
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div>
+    <form method="POST" action="">
+        {{form.hidden_tag()}}
+        <fieldset>
+            <legend>create an account here</legend>
+            <p>
+                {{form.user_first_name.label}}
+                {{form.user_first_name(size=30)}}
+                {% if form.user_first_name.errors %}
+                {% for error in form.user_first_name.errors %}
+                    <span>{{error}}</span>
+                {% endfor %}
+                {% endif %}
+            </p>
+            <p>
+                {{form.user_second_name.label}}
+                {{form.user_second_name(size=30)}}
+                {% if form.user_second_name.errors %}
+                {% for error in form.user_second_name.errors %}
+                    <span>{{error}}</span>
+                {% endfor %}
+                {% endif %}
+            </p>
+            <p>
+                {{form.user_middle_name.label}}
+                {{form.user_middle_name(size=30)}}
+                {% if form.user_middle_name.errors %}
+                {% for error in form.user_middle_name.errors %}
+                    <span>{{error}}</span>
+                {% endfor %}
+                {% endif %}
+            </p>
+            <p>
+                {{form.user_email.label}}
+                {{form.user_email(size=30)}}
+                {% if form.user_email.errors %}
+                {% for error in form.user_email.errors %}
+                <span>{{error}}</span>
+                {% endfor %}
+                {% endif %}
+            </p>
+            <p>
+                {{form.user_password.label}}
+                {{form.user_password(size=30)}}
+                {% if form.user_password.errors %}
+                {% for error in form.user_password.errors %}
+                <span>{{error}}</span>
+                {% endfor %}
+                {% endif %}
+            </p>
+            <p>
+                {{form.user_confirm_password.label}}
+                {{form.user_confirm_password(size=30)}}
+                {% if form.user_confirm_password.errors %}
+                {% for error in form.user_confirm_password.errors %}
+                <span>{{error}}</span>
+                {% endfor %}
+                {% endif %}
+            </p>
+        </fieldset>
+        <p class="sub">
+            {{ form.submit(class="btn btn-outline-info ") }}
+        </p>
+    </form>
+    <P class="info">
+        Already have an account? <a href ="{{ url_for('login') }}">login</a>
+    </P>
+</div>
+
+{% endblock %}

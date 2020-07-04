@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block body %}
+
+{% for item in language %}
+    <p>"question_id":{{question_id}}</p>
+    {% if item.section %}
+        <p>section: {{item.section}}</p>
+    {% endif %}
+    {% if item.image %}
+    <img src='{{item.image}}'/>
+    {% endif %}
+    <p>question: {{item.question}}</p>
+    <p>a){{item.option.a}}</p>
+    <p>b){{item.option.b}}</p>
+    <p>c){{item.option.c}}</p>
+    <p>d){{item.option.d}}</p>
+    <form method="POST" action="/answer">
+        {{form.csrf_token}}
+        <p>{{form.answer.label}}
+        {{form.answer(size=10)}}
+        </p>         
+        <p>{{form.submit()}}</p>
+    </form>
+{% endfor %}
+    <span style="float: left;"><button><a href="{{url_for('subject_list')}}">back to subject list</a></button></span>
+{% endblock %}

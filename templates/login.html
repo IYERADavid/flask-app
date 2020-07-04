@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block head %}
+<style>
+    fieldset{
+        margin: 0 auto;
+        width: 14px;
+    }
+    .sub{
+        padding-left: 525px;
+    }
+    .info{
+        text-align: center;
+    }
+
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div>
+    <form method="POST" action="">
+        {{form.hidden_tag()}}
+        <fieldset>
+            <legend>login to your account</legend>
+            <p>
+                {{form.user_email.label}}
+                {{form.user_email(size=30)}}
+                {% if form.user_email.errors %}
+                {% for error in form.user_email.errors %}
+                    <span>{{error}}</span>
+                {% endfor %}
+                {% endif %}
+            </p>
+            <p>
+                {{form.user_password.label}}
+                {{form.user_password(size=30)}}
+                {% if form.user_password.errors %}
+                {% for error in form.user_password.errors %}
+                <span>{{error}}</span>
+                {% endfor %}
+                {% endif %}
+            </p>
+            <p>
+                {{form.remember.label}}
+                {{form.remember(size=4)}}
+            </p>
+        </fieldset>
+        <p class="sub">
+            {{ form.submit(class="btn btn-outline-info ") }}
+        </p>
+        <p class="info">
+            <a href ="{{url_for('reset_user_password')}}">Forgot password</a>
+        </p>
+    </form>
+    <P class="info">
+        Need an account? <a href ="{{ url_for('register') }}">sing up now</a>
+    </P>
+</div>
+
+{% endblock %}

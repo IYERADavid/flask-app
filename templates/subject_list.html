@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block head %}
+<style>
+ .css{
+     color: lightgreen;
+ }
+ .subjects_list{
+     padding: 8px;
+ }
+</style>
+{% endblock %}
+
+{% block body %}
+<table>
+<form method="POST" action="">
+    <tr><th style="padding-right: 158px;">enter a subject?</th></tr>
+    {{form.csrf_token}}
+    <tr><td> 
+        {{form.subjects.label}}
+        {{form.subjects(size=20)}}
+        {% if form.subjects.errors %}
+        {% for error in form.subjects.errors %}
+            <span>{{error}}</span>
+        {% endfor %}
+        {% endif %}
+    </td></tr>
+    <tr><th style="padding-right: 190px;"> {{form.submit()}} </th></tr>
+</form>        
+</table>
+<span style="color: red;">NOTE!</span>
+<ul>
+<li> you must enter a subject from our supported subjects list?</li>
+</ul>
+<table class="subjects_list" border="1" style="background-color:black">
+    <tr>
+        <th style="background-color: silver;color: dodgerblue;">list of supported subjects</th>
+    </tr>
+    <tr class="css"><td>mathematics</td></tr>
+    <tr class="css"><td>physics</td></tr>
+    <tr class="css"><td>biology</td></tr>
+    <tr class="css"><td>chemistry</td></tr>    
+    <tr class="css"><td>english</td></tr>
+    <tr class="css"><td>geography</td></tr>
+    <tr class="css"><td>history</td></tr>
+    <tr class="css"><td>economics</td></tr>
+</table>
+<span style="float: left;"><button><a href="{{url_for('login')}}">logout</a></button></span>
+{% endblock %}
