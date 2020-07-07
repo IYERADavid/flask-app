@@ -30,13 +30,15 @@ class Questions(db.Model):
     question_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)  
     question_time = db.Column(db.DateTime, default=datetime.utcnow)
-    question = db.Column(db.String(1000000000000), nullable=False)
+    user_answers = db.Column(db.String(3), nullable=True)
+    question = db.Column(db.String(1000000000000000000), nullable=False)
 
 class Marks(db. Model):
     mark_id =  db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
     questions_done = db.Column(db.Integer, nullable=False, default=0) 
-    points = db.Column(db.Integer, nullable=False, default=0)   
+    points = db.Column(db.Integer, nullable=False, default=0) 
+
 
 url = "https://questions.aloc.ng/api/q/1?subject="
 
@@ -44,31 +46,47 @@ url = "https://questions.aloc.ng/api/q/1?subject="
 @app.route('/answer',methods=['GET','POST'])
 def answers():
     form = AnswerForm()
-    user_answer= form.answer.data
-    subject = session.get('subject',None)
-    user_id = session.get('user_id',None) 
-    question_id = session.get("question_id",None)
-    check_answer = Questions.query.filter_by(question_id=question_id).first()
-    language = check_answer.question
-    language = ast.literal_eval(language)
-    update_questions = Marks.query.filter_by(user_id=user_id).first()
-    update_questions.questions_done += 1
-    db.session.commit()
-    question_done = update_questions.questions_done  
-    for item in language:
-        answer = item[u'answer']
-        if answer == user_answer:
-            update_marks = Marks.query.filter_by(user_id=user_id).first()
-            update_marks.points += 1
-            db.session.commit() 
-            score = update_marks.points
+    if form.validate_on_submit() or request.method == 'GET':
+        user_answer= form.answer.data
+        subject = session.get('subject',None)
+        user_id = session.get('user_id',None) 
+        question_id = session.get("question_id",None)
+        update_questions = Marks.query.filter_by(user_id=user_id).first()
+        if user_answer:
+            update_questions.questions_done += 1
+            db.session.commit()
+            question_done = update_questions.questions_done
+            add_user_answer = Questions.query.filter_by(question_id=question_id).first()
+            add_user_answer.user_answers = user_answer
+            db.session.commit()
+            language = add_user_answer.question
+            language = ast.literal_eval(language)
+            user_answer = add_user_answer.user_answers
+            for item in language:
+                answer = item[u'answer']
+                if answer == user_answer:
+                    update_marks = Marks.query.filter_by(user_id=user_id).first()
+                    update_marks.points += 1
+                    db.session.commit() 
+                    score = update_marks.points
+                else:
+                    update_marks = Marks.query.filter_by(user_id=user_id).first()
+                    score = update_marks.points
         else:
+            question_done = update_questions.questions_done
+            add_user_answer = Questions.query.filter_by(question_id=question_id).first()
+            language = add_user_answer.question
+            language = ast.literal_eval(language)
+            user_answer = add_user_answer.user_answers
             update_marks = Marks.query.filter_by(user_id=user_id).first()
             score = update_marks.points
 
-    flash(message="Answer for {} question ".format(subject))
-    return render_template('answers.html',language=language,form=form,question_id=question_id,
-    question_done=question_done,score=score)      
+        flash(message="Answer for {} question ".format(subject))
+        return render_template('answers.html',language=language,user_answer=user_answer,question_id=question_id,
+        question_done=question_done,score=score)
+    else:
+        flash(message="You answer must be one of this a,b,c,d")
+        return redirect(url_for('questions'))      
 
 
 @app.route('/questions',methods=['GET','POST'])
@@ -97,8 +115,8 @@ def questions():
     session['question_id'] = question_id
     for item in language:
         answer = item[u'answer']
-        #print(answer)
-    flash(message="welcome to {} question".format(subject))
+        print(answer)
+    flash(message="Welcome to {} question".format(subject))
     return render_template('questions.html',language=language ,question_id=question_id ,form=form)
 
 @app.route('/subjects',methods=['GET','POST'])
@@ -144,7 +162,7 @@ def register():
             db.session.commit()
             flash(message='Account successful created for {}'.format(form.user_first_name.data))
             return redirect(url_for('login'))
-    return render_template('register.html',title='signup',form=form)
+    return render_template('register.html',form=form)
 
 
 @app.route('/login',methods=['GET','POST'])
@@ -166,7 +184,7 @@ def login():
         else:
             flash(message='your email or password is incorrect')
             return redirect(url_for('login')) 
-    return render_template('login.html',title='login',form=form)
+    return render_template('login.html',form=form)
 @app.route('/',methods=['GET','POST'])
 def home_page():
     return render_template('home.html')

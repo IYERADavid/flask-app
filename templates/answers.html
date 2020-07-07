@@ -20,8 +20,8 @@
     <p>c){{item.option.c}}</p>
     <p>d){{item.option.d}}</p>
     <h4>correct answer is {{item.answer}}</h4>
-    <p>your answer is {{form.answer.data}}</p>
-    {% if item.answer == form.answer.data %}
+    <p>your answer is {{user_answer}}</p>
+    {% if item.answer == user_answer %}
         <p class="yes" style="background-color: green;">your answer is correct</p>
     {% else %}
         <p class="no" style="background-color: red;">your answer is wrong</p>

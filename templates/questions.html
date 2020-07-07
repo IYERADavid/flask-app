@@ -21,8 +21,14 @@
     <p>d){{item.option.d}}</p>
     <form method="POST" action="/answer">
         {{form.csrf_token}}
-        <p>{{form.answer.label}}
-        {{form.answer(size=10)}}
+        <p>
+            {{form.answer.label}}
+            {{form.answer(size=10)}}
+            {% if form.answer.errors %}
+            {% for error in form.answer.errors %}
+                <span style="color: red;">{{error}}</span>
+            {% endfor %}
+            {% endif %}
         </p>         
         <p>{{form.submit()}}</p>
     </form>

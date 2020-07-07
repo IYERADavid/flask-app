@@ -37,6 +37,6 @@ class SubjectForm(FlaskForm):
 
 
 class AnswerForm(FlaskForm):
-    answer = StringField('your answer')
+    answer = StringField('your answer',validators=[DataRequired(), AnyOf(values=['a','b','c','d'])])
     submit = SubmitField('submit')
   
