@@ -4,14 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Real course</title>
-    <link rel="my icon" href="{{url_for('static', filename= 'favicon.png') }}" style="color: black;">
+    <link rel="my icon" href="{{url_for('static', filename= 'favicon.png') }}">
     {% with messages = get_flashed_messages() %}
     {% if messages %}
+        <div class="maines">
         <ul class=flashes>
     {% for message in messages %}
         <li style="color: deepskyblue;">{{ message }}</li>
     {% endfor %}
         </ul>
+        </div>
     {% endif %}
     {% endwith %}
     {% block head %}

@@ -1,4 +1,4 @@
-from flask import Flask ,render_template,url_for,request,redirect,flash,session
+from flask import Flask ,render_template,url_for,request,redirect,flash,session,g
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime 
 from operator import itemgetter
@@ -43,91 +43,129 @@ class Marks(db. Model):
 url = "https://questions.aloc.ng/api/q/1?subject="
 
 
-@app.route('/answer',methods=['GET','POST'])
-def answers():
-    form = AnswerForm()
-    if form.validate_on_submit() or request.method == 'GET':
-        user_answer= form.answer.data
-        subject = session.get('subject',None)
-        user_id = session.get('user_id',None) 
-        question_id = session.get("question_id",None)
-        update_questions = Marks.query.filter_by(user_id=user_id).first()
-        if user_answer:
-            update_questions.questions_done += 1
-            db.session.commit()
-            question_done = update_questions.questions_done
-            add_user_answer = Questions.query.filter_by(question_id=question_id).first()
-            add_user_answer.user_answers = user_answer
-            db.session.commit()
-            language = add_user_answer.question
-            language = ast.literal_eval(language)
-            user_answer = add_user_answer.user_answers
-            for item in language:
-                answer = item[u'answer']
-                if answer == user_answer:
-                    update_marks = Marks.query.filter_by(user_id=user_id).first()
-                    update_marks.points += 1
-                    db.session.commit() 
-                    score = update_marks.points
-                else:
-                    update_marks = Marks.query.filter_by(user_id=user_id).first()
-                    score = update_marks.points
-        else:
-            question_done = update_questions.questions_done
-            add_user_answer = Questions.query.filter_by(question_id=question_id).first()
-            language = add_user_answer.question
-            language = ast.literal_eval(language)
-            user_answer = add_user_answer.user_answers
-            update_marks = Marks.query.filter_by(user_id=user_id).first()
-            score = update_marks.points
+@app.before_request
+def before_request():
+    g.user_id = None
+    user_id = session.get('user_id',None)
+    if user_id:
+        g.user_id = user_id
+@app.route('/logout',methods=['GET','POST'])
+def logout():
+    if not g.user_id:
+        flash(message="You must Login in order to logout (Don't have an account Singup first)")
+        return redirect(url_for('home_page'))   
+    else:      
+        session.pop('user_id',None)
+        session.pop('subject_name',None)
+        flash(message="YOU have successful logged out")
+        return redirect(url_for('home_page'))
 
-        flash(message="Answer for {} question ".format(subject))
-        return render_template('answers.html',language=language,user_answer=user_answer,question_id=question_id,
-        question_done=question_done,score=score)
+@app.route('/answer',methods=['POST'])
+def answers():
+    if not g.user_id:
+        flash(message="You must Singup or Login")
+        return redirect(url_for('home_page'))
+    elif request.method == 'GET':
+        flash(message="DO the question to get the answer")
+        return redirect(url_for('subject_list'))        
     else:
-        flash(message="You answer must be one of this a,b,c,d")
-        return redirect(url_for('questions'))      
+        form = AnswerForm()
+        verify_user_login = Questions.query.filter_by(question_id=form.question_id.data).first()
+        current_user = verify_user_login.user_id
+        if form.validate_on_submit() and current_user == session.get('user_id',None):
+            user_answer= form.answer.data
+            subject = form.subject_name.data 
+            question_id = form.question_id.data
+            user_id = session.get('user_id',None)
+            get_user_name = User.query.filter_by(id=user_id).first()
+            user_name = get_user_name.user_second_name
+            print(question_id)
+            update_questions = Marks.query.filter_by(user_id=user_id).first()
+            if user_answer:
+                update_questions.questions_done += 1
+                db.session.commit()
+                question_done = update_questions.questions_done
+                add_user_answer = Questions.query.filter_by(question_id=question_id).first()
+                add_user_answer.user_answers = user_answer
+                db.session.commit()
+                language = add_user_answer.question
+                language = ast.literal_eval(language)
+                user_answer = add_user_answer.user_answers
+                for item in language:
+                    answer = item[u'answer']
+                    if answer == user_answer:
+                        update_marks = Marks.query.filter_by(user_id=user_id).first()
+                        update_marks.points += 1
+                        db.session.commit() 
+                        score = update_marks.points
+                    else:
+                        update_marks = Marks.query.filter_by(user_id=user_id).first()
+                        score = update_marks.points
+            flash(message="Answer for {} question ".format(subject))
+            return render_template('answers.html',language=language,user_answer=user_answer,question_id=question_id,
+            question_done=question_done,score=score,user_name=user_name)
+        elif not form.validate_on_submit() and current_user == session.get('user_id',None):
+            form = AnswerForm()
+            question_id = form.question_id.data
+            get_question = Questions.query.filter_by(question_id=question_id).first()
+            language = get_question.question
+            language = ast.literal_eval(language)
+            error = "Your answer must be one of this a,b,c or d"
+            flash(message="{}".format(error))
+            return render_template('questions.html',language=language ,question_id=question_id ,form=form)
+        else:
+            flash(message="Hey you can't continue becouse another user logged in on your device ( Now everything done from here it is for another user who logged in )")
+            return redirect(url_for('subject_list'))
 
 
 @app.route('/questions',methods=['GET','POST'])
 def questions():
-    form = AnswerForm()
-    language = session.get("subject",None)
-    language = language.lower()
-    subject = session.get("subject",None)  
-    json_obj = urllib2.urlopen(url + language)
-    data = json.load(json_obj)
-    language=data[u'data']
-    # variable language contain list of question
-    user_id = session.get('user_id',None)
-    # user_id contain the id of the use who logged in
-    language = str(language)
-    question = Questions(user_id= user_id ,question= language)
-    # i added user_id and list of question to database
-    # i have set question_id to be primary key 
-    db.session.add(question)
-    db.session.commit()
-    question_id = question.question_id
-    print (question_id)
-    get_question = Questions.query.filter_by(question_id=question_id).first()
-    language = get_question.question
-    language = ast.literal_eval(language)
-    session['question_id'] = question_id
-    for item in language:
-        answer = item[u'answer']
-        print(answer)
-    flash(message="Welcome to {} question".format(subject))
-    return render_template('questions.html',language=language ,question_id=question_id ,form=form)
+    if not g.user_id:
+        flash(message="You must Singup or Login")
+        return redirect(url_for('home_page'))
+    elif request.method == 'GET' and not session.get('subject_name',None):
+        flash(message="You must choose a subject to get a question")
+        return redirect(url_for('subject_list'))
+    else:    
+        form = AnswerForm()
+        language = session.get('subject_name',None)
+        print(language)
+        language = language.lower()
+        subject = session.get("subject_name",None)  
+        json_obj = urllib2.urlopen(url + language)
+        data = json.load(json_obj)
+        language=data[u'data']
+        # variable language contain list of question
+        user_id = session.get('user_id',None)
+        # user_id contain the id of the use who logged in
+        language = str(language)
+        question = Questions(user_id= user_id ,question= language)
+        # i added user_id and list of question to database
+        # i have set question_id to be primary key 
+        db.session.add(question)
+        db.session.commit()
+        question_id = question.question_id
+        print (question_id)
+        get_question = Questions.query.filter_by(question_id=question_id).first()
+        language = get_question.question
+        language = ast.literal_eval(language)
+        for item in language:
+            answer = item[u'answer']
+            print(answer)
+        flash(message="Welcome to {} question".format(subject))
+        return render_template('questions.html',language=language ,question_id=question_id ,form=form,subject=subject)
 
 @app.route('/subjects',methods=['GET','POST'])
 def subject_list():
-    form = SubjectForm()
-    if form.validate_on_submit():
-        session["subject"]= form.subjects.data
-        return redirect(url_for('questions'))
+    if not g.user_id:
+        flash(message="You must Singup or Login")
+        return redirect(url_for('home_page'))
     else:
-        return render_template('subject_list.html',form=form)  
-    return render_template('subject_list.html',form=form)
+        form = SubjectForm()
+        if form.validate_on_submit():
+            session['subject_name'] = form.subjects.data
+            return redirect(url_for('questions'))  
+        return render_template('subject_list.html',form=form)
 
 
 @app.route('/user_password',methods=['GET','POST'])
@@ -153,7 +191,7 @@ def register():
     if form.validate_on_submit():
         check_email = User.query.filter_by(user_email= form.user_email.data).first()
         if check_email:
-            flash(message='the email you entered already have an account here')
+            flash(message='the email you entered already have an account here, Try another email')
             return redirect(url_for('register'))
         else:
             user_data = User(user_first_name= form.user_first_name.data,user_second_name= form.user_second_name.data,
@@ -167,6 +205,8 @@ def register():
 
 @app.route('/login',methods=['GET','POST'])
 def login():
+    if request.method == 'POST':
+        session.pop('user_id',None)
     form = LoginForm()
     if form.validate_on_submit():
         verify_user = User.query.filter_by(user_email=form.user_email.data).first()

@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block body %}
+<a style="padding-left: 650px;font-size: 25px;" href="{{url_for('home_page')}}">Home</a>
 
 {% for item in language %}
     <p>"answer_id":{{question_id}}</p>
@@ -15,6 +16,7 @@
         <img src='{{item.image}}'/>
     {% endif %}
     <p>quesion: {{item.question}}</p>
+    <p>options:</p>
     <p>a){{item.option.a}}</p>
     <p>b){{item.option.b}}</p>
     <p>c){{item.option.c}}</p>
@@ -31,9 +33,10 @@
         <p>solution: {{item.solution}}</p>
     {% endif %}
     <table border="1">
+        <tr><th colspan="2">{{user_name}}'s mark table</th></tr>
         <tr>
-        <th>your total question done is</th>
-        <th>your total score is</th>
+        <td>your total question done is</td>
+        <td>your total score is</td>
         </tr>
         <tr>
             <td>{{question_done}}</td>

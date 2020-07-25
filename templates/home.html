@@ -1,16 +1,23 @@
 {% extends "layout.html" %}
 
 {% block head %}
-
+<style>
+    .links{
+        float: left;
+        padding-left: 50px;
+    }
+</style>
 {% endblock %}
 
 {% block body %}
 
 <header style="color: black;font-size: 65px;">Welcome to Real course program</header>
 <div>
-    <a href="{{url_for('register')}}">SINGUP</a>
-    <a style="float: right; padding-right: 1200px;" href="{{url_for('login')}}">LOGIN</a>
+    <a class="links" href="{{url_for('register')}}">SIGNUP</a>
+    <a class="links" href="{{url_for('login')}}">LOGIN</a>
+    <a class="links" href="{{url_for('subject_list')}}">GET started</a>
 </div>
+<di><br></div>
 <img src="{{url_for('static', filename='home.jpg')}}" />
 <ul style="float: right;padding-right: 50px;">
     <h3>About</h3>

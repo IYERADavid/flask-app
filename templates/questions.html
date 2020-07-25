@@ -2,9 +2,20 @@
 
 {% block head %}
 
+<script>
+    function questions_id()
+    {
+        document.getElementById('2342').value
+        = parseInt('{{question_id | safe }}');
+        document.getElementById('5675').value
+        = '{{subject | safe }}';
+    }
+</script>
+
 {% endblock %}
 
 {% block body %}
+<a style="padding-left: 650px;font-size: 25px;" href="{{url_for('home_page')}}">Home</a>
 
 {% for item in language %}
     <p>"question_id":{{question_id}}</p>
@@ -15,12 +26,15 @@
     <img src='{{item.image}}'/>
     {% endif %}
     <p>question: {{item.question}}</p>
+    <p>options:</p>
     <p>a){{item.option.a}}</p>
     <p>b){{item.option.b}}</p>
     <p>c){{item.option.c}}</p>
     <p>d){{item.option.d}}</p>
     <form method="POST" action="/answer">
         {{form.csrf_token}}
+        {{form.subject_name()}}
+        {{form.question_id()}}
         <p>
             {{form.answer.label}}
             {{form.answer(size=10)}}
@@ -30,7 +44,7 @@
             {% endfor %}
             {% endif %}
         </p>         
-        <p>{{form.submit()}}</p>
+        <span>{{form.submit()}}</span>
     </form>
 {% endfor %}
     <span style="float: left;"><button><a href="{{url_for('subject_list')}}">back to subject list</a></button></span>
