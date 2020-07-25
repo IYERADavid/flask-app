@@ -1,3 +1,5 @@
+import requests
+import json
 from flask import Flask ,render_template,url_for,request,redirect,flash,session,g
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime 
@@ -132,9 +134,9 @@ def questions():
         print(language)
         language = language.lower()
         subject = session.get("subject_name",None)  
-        json_obj = urllib2.urlopen(url + language)
-        data = json.load(json_obj)
-        language=data[u'data']
+        req = requests.get(url + language)
+        res = req.json()
+        language = res[u'data']
         # variable language contain list of question
         user_id = session.get('user_id',None)
         # user_id contain the id of the use who logged in
