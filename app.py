@@ -79,7 +79,7 @@ def answers():
             user_id = session.get('user_id',None)
             get_user_name = User.query.filter_by(id=user_id).first()
             user_name = get_user_name.user_second_name
-            print(question_id)
+            #print(question_id)
             update_questions = Marks.query.filter_by(user_id=user_id).first()
             if user_answer:
                 update_questions.questions_done += 1
