@@ -11,7 +11,7 @@ import ast
 
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] ='DAVID'
+app.config['SECRET_KEY'] ='DAVIDfhghgjfeiddidjfggndsvnbvxmmqwie337f'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 
