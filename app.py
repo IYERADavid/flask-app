@@ -9,6 +9,7 @@ import json
 import ast
 
 
+proxies = {'http': 'http://user:pass@10.10.1.10:3128/'}
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] ='DAVIDfhghgjfeiddidjfggndsvnbvxmmqwie337f'
@@ -132,7 +133,7 @@ def questions():
         print(language)
         language = language.lower()
         subject = session.get("subject_name",None)
-        req = requests.get(url + language)
+        req = requests.get(url + language,proxies=proxies)
         res = req.json()
         language = res[u'data']
         # variable language contain list of question
