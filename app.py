@@ -5,9 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime 
 from operator import itemgetter
 from red import RegistrationForm,LoginForm,ResetForm,SubjectForm,AnswerForm
-import urllib2
 import json  
-import random
 import ast
 
 
