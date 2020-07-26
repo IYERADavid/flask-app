@@ -133,7 +133,7 @@ def questions():
         language = session.get('subject_name',None)
         print(language)
         language = language.lower()
-        subject = session.get("subject_name",None)  
+        subject = session.get("subject_name",None)
         req = requests.get(url + language)
         res = req.json()
         language = res[u'data']
