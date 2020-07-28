@@ -1,12 +1,18 @@
 {% extends "layout.html" %}
 
 {% block head %}
-
+<style>
+    .home{
+        text-align: center;
+        font-size: 25px;
+        padding-left:150px;
+        font-style: italic;
+    }
+</style>
 {% endblock %}
 
 {% block body %}
-<a style="padding-left: 650px;font-size: 25px;" href="{{url_for('home_page')}}">Home</a>
-
+<p class="home"><a href="{{url_for('home_page')}}">Home</a></p>
 {% for item in language %}
     <p>"answer_id":{{question_id}}</p>
     {% if item.section %}
@@ -44,7 +50,7 @@
         </tr>
     </table>
     <span><button><a href="{{url_for('questions')}}">Get another question</a></button></span>
-    <span style="float: right;"><button><a href="{{url_for('subject_list')}}">back to subject list</a></button></span>
+    <a style="float: right;padding-right: 200px;" href="{{url_for('subject_list')}}">SubJects</a>
 {% endfor %}
 
 {% endblock %}   

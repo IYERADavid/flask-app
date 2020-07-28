@@ -8,11 +8,18 @@
  .subjects_list{
      padding: 8px;
  }
+ .home{
+    text-align: center;
+    font-size: 25px;
+    padding-left:150px;
+    font-style: italic;
+
+ }
 </style>
 {% endblock %}
 
 {% block body %}
-<a style="padding-left: 600px;font-size: 25px;" href="{{url_for('home_page')}}">Home</a>
+<p class="home"><a href="{{url_for('home_page')}}">Home</a></p>
 <table>
 <form method="POST" action="">
     <tr><th style="padding-right: 158px;">enter a subject?</th></tr>
@@ -46,5 +53,4 @@
     <tr class="css"><td>history</td></tr>
     <tr class="css"><td>economics</td></tr>
 </table>
-<span style="float: left;padding-top: 24px;font-size: 18px;"><a href="{{url_for('logout')}}">Logout</a></span>
 {% endblock %}

@@ -1,20 +1,12 @@
 {% extends "layout.html" %}
 
 {% block head %}
-<style>
-    .links{
-        float: left;
-        padding-left: 50px;
-    }
-</style>
 {% endblock %}
 
 {% block body %}
 
 <header style="color: black;font-size: 65px;">Welcome to Real course program</header>
 <div>
-    <a class="links" href="{{url_for('register')}}">SIGNUP</a>
-    <a class="links" href="{{url_for('login')}}">LOGIN</a>
     <a class="links" href="{{url_for('subject_list')}}">GET started</a>
 </div>
 <di><br></div>
@@ -35,5 +27,6 @@
     </li>
     <img style="width: 300px;height: 150px;" src="{{url_for('static', filename='site.jpg')}}" />
 </ul>
-<p>online Real course.com</p>
+<p>Get skills from online Real course</p>
+<a href="{{url_for('logout')}}">Logout</a>
 {% endblock %}

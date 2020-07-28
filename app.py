@@ -9,7 +9,6 @@ import json
 import ast
 
 
-proxies = {'http': 'http://user:pass@10.10.1.10:3128/'}
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] ='DAVIDfhghgjfeiddidjfggndsvnbvxmmqwie337f'
@@ -41,7 +40,6 @@ class Marks(db. Model):
     points = db.Column(db.Integer, nullable=False, default=0) 
 
 
-url = "https://questions.aloc.ng/api/q/1?subject="
 
 
 @app.before_request
@@ -51,21 +49,17 @@ def before_request():
     if user_id:
         g.user_id = user_id
 @app.route('/logout',methods=['GET','POST'])
-def logout():
-    if not g.user_id:
-        flash(message="You must Login in order to logout (Don't have an account Singup first)")
-        return redirect(url_for('home_page'))   
-    else:      
-        session.pop('user_id',None)
-        session.pop('subject_name',None)
-        flash(message="YOU have successful logged out")
-        return redirect(url_for('home_page'))
+def logout():         
+    session.pop('user_id',None)
+    session.pop('subject_name',None)
+    flash(message="YOU have successful logged out")
+    return redirect(url_for('login'))
 
 @app.route('/answer',methods=['POST'])
 def answers():
     if not g.user_id:
-        flash(message="You must Singup or Login")
-        return redirect(url_for('home_page'))
+        flash(message="You must Login or Singup")
+        return redirect(url_for('login'))
     elif request.method == 'GET':
         flash(message="DO the question to get the answer")
         return redirect(url_for('subject_list'))        
@@ -116,26 +110,28 @@ def answers():
             return render_template('questions.html',language=language ,question_id=question_id ,form=form)
         else:
             flash(message="Hey you can't continue becouse another user logged in on your device ( Now everything done from here it is for another user who logged in )")
-            return redirect(url_for('subject_list'))
+            return redirect(url_for('home_page'))
 
 
 @app.route('/questions',methods=['GET','POST'])
 def questions():
     if not g.user_id:
-        flash(message="You must Singup or Login")
-        return redirect(url_for('home_page'))
+        flash(message="You must Login or Singup")
+        return redirect(url_for('login'))
     elif request.method == 'GET' and not session.get('subject_name',None):
         flash(message="You must choose a subject to get a question")
         return redirect(url_for('subject_list'))
     else:    
         form = AnswerForm()
         language = session.get('subject_name',None)
-        print(language)
+        #print(language)
         language = language.lower()
         subject = session.get("subject_name",None)
-        req = requests.get(url + language,proxies=proxies)
+        url1 = "https://questions.aloc.ng/api/q/1?subject="
+        url = url1 + language
+        req = requests.get(url)
         res = req.json()
-        language = res[u'data']
+        language = res['data']
         # variable language contain list of question
         user_id = session.get('user_id',None)
         # user_id contain the id of the use who logged in
@@ -146,12 +142,12 @@ def questions():
         db.session.add(question)
         db.session.commit()
         question_id = question.question_id
-        print (question_id)
+        #print (question_id)
         get_question = Questions.query.filter_by(question_id=question_id).first()
         language = get_question.question
         language = ast.literal_eval(language)
         for item in language:
-            answer = item[u'answer']
+            answer = item['answer']
             print(answer)
         flash(message="Welcome to {} question".format(subject))
         return render_template('questions.html',language=language ,question_id=question_id ,form=form,subject=subject)
@@ -159,8 +155,8 @@ def questions():
 @app.route('/subjects',methods=['GET','POST'])
 def subject_list():
     if not g.user_id:
-        flash(message="You must Singup or Login")
-        return redirect(url_for('home_page'))
+        flash(message="You must Login or Singup")
+        return redirect(url_for('login'))
     else:
         form = SubjectForm()
         if form.validate_on_submit():
@@ -216,18 +212,21 @@ def login():
             user_id = verify_user.id
             user_mark_table = Marks.query.filter_by(user_id = user_id).first()
             if user_mark_table:
-                return redirect(url_for('subject_list'))
+                return redirect(url_for('home_page'))
             else:
                 create_user_mark_table = Marks(user_id = user_id , points = 0 )
                 db.session.add(create_user_mark_table)
                 db.session.commit()
-                return redirect(url_for('subject_list'))
+                return redirect(url_for('home_page'))
         else:
             flash(message='your email or password is incorrect')
             return redirect(url_for('login')) 
     return render_template('login.html',form=form)
 @app.route('/',methods=['GET','POST'])
 def home_page():
+    if not g.user_id:
+        flash(message="You must Login or Singup")
+        return redirect(url_for('login'))
     return render_template('home.html')
 
 if __name__ == "__main__":

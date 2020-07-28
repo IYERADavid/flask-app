@@ -11,11 +11,18 @@
         = '{{subject | safe }}';
     }
 </script>
-
+<style>
+    .home{
+        text-align: center;
+        font-size: 25px;
+        padding-left:150px;
+        font-style: italic;
+    }
+</style>
 {% endblock %}
 
 {% block body %}
-<a style="padding-left: 650px;font-size: 25px;" href="{{url_for('home_page')}}">Home</a>
+<p class="home"><a href="{{url_for('home_page')}}">Home</a></p>
 
 {% for item in language %}
     <p>"question_id":{{question_id}}</p>
@@ -47,5 +54,5 @@
         <span>{{form.submit()}}</span>
     </form>
 {% endfor %}
-    <span style="float: left;"><button><a href="{{url_for('subject_list')}}">back to subject list</a></button></span>
+    <p style="text-align: center;padding-left: 520px;"><a href="{{url_for('subject_list')}}">SubJect</a></p>
 {% endblock %}
