@@ -1,0 +1,185 @@
+<html>
+  <head>
+    <style type="text/css">
+  .div1 {
+    text-align: center;
+    padding: 10px;
+    
+  }
+  .down {
+    float: right;
+  }
+      input[type="text"] {
+      
+    font-size: inherit;
+    width: 200px;
+    padding: 15px;
+    margin: 5px 0 22px 0;
+    display: inline-block;
+    border: none;
+    background: #f1f1f1;
+      }
+      table#inputFieldsTable {
+        border-collapse: collapse;
+        width:100%;
+      }
+      table#inputFieldsTable td {
+        border-collapse: collapse;
+        border-bottom: 1px solid #dddddd;
+        padding: 10px;
+      }
+      /* for buttons */
+      input[type="submit"] {
+      
+    background-color: #4CAF50;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px 0;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    opacity: 0.9;
+      }
+      
+      table#displayingUserInput {
+        border-bottom:1px solid #dddddd;
+        width: 100%;
+        border-collapse: collapse;
+      }
+      table#displayingUserInput th {
+        background-color: cornflowerblue;
+      }
+      
+      table#displayingUserInput th, td{
+        padding: 8px;
+        border-collapse: collapse;
+        border-bottom: 10px solid #dddddd;
+      }
+      
+      table#displayingUserInput tr:hover{
+        background-color: #dddddd;
+      }
+      
+    </style>
+    
+    <script type="text/javascript">
+    
+    
+    
+      function clearIUnputFields() {
+        document.getElementById("firstName").value = '';
+        document.getElementById("lastName").value = '';
+        document.getElementById("email").value = '';
+      }
+      function addRowToTheTable() {
+        var newTable = document.getElementById("displayingUserInput");
+        var fName = document.getElementById("firstName").value;
+        var lName = document.getElementById("lastName").value;
+        var email = document.getElementById("email").value;
+        
+        if (fName != "" && lName != "" && email != "") {
+          
+          
+          var addRow = newTable.insertRow(newTable.rows.length);
+          
+          var fNamecell = addRow.insertCell(0);
+          var lNamecell = addRow.insertCell(1);
+          var emailcell = addRow.insertCell(2);
+          
+          fNamecell.innerHTML = fName;
+          lNamecell.innerHTML = lName;
+          emailcell.innerHTML = email;
+          displayselectedRowCellsValueonInputFields();
+          
+          
+        }else {
+          alert("input field/fields are empty");
+        }
+      }
+      
+      var selectedRowIndex;
+      
+      function displayselectedRowCellsValueonInputFields() {
+        
+        var tb = document.getElementById("displayingUserInput");      
+        var tbRowsLength = tb.rows.length;
+        
+        for (var i = 1; i < tbRowsLength; i++) {
+          
+          tb.rows[i].onclick = function () {
+            
+            selectedRowIndex = this.rowIndex
+              //  alert(this.rowIndex);
+              // displaying selected row in input fields
+        document.getElementById("firstName").value = this.cells[0].innerHTML;
+        document.getElementById("lastName").value = this.cells[1].innerHTML;
+        document.getElementById("email").value = this.cells[2].innerHTML;
+          };
+          
+        }
+      }
+      function editSelectedRow() {
+        alert("INPUT USER NUMBER:" + selectedRowIndex);
+      }
+      
+      
+      
+      
+    </script>
+    
+    </head>
+  <body>
+    <div class="div1"><h1><i>Displaying user inputs In the Table</i></h1></div>
+    <table id="inputFieldsTable">
+      <tr>
+        <td>
+          <label><b>First name: </b></label>
+          <input type="text" name="firstname" id="firstName" placeholder="first name">
+        </td>
+        
+        <td>
+          <input type="submit" name="submitAddrow" value="Add User" onclick="addRowToTheTable()">
+        </td>
+        
+      </tr>
+      
+      <tr>
+        <td>
+          <label><b>Last name: </b></label>
+          <input type="text" name="lastname" id="lastName" placeholder="last name">
+        </td>
+        
+        <td>
+          <input type="submit" name="submit" value="Clear Input Fields" onclick="clearIUnputFields()">
+        </td>
+        
+      </tr>
+      
+      <tr>
+        <td>
+          <label><b>Email: </b></label>
+          <input type="text" name="email" id="email" placeholder="email">
+        </td>
+        <td>
+          <input type="submit" name="editRow" value="USER ID" onclick="editSelectedRow()">
+        </td>
+        
+        
+      </tr>
+
+    </table>
+    
+    <br>
+    <br>
+  <table id="displayingUserInput">
+    <tr>
+      <th>First Name</th>
+      <th>Last Name</th>
+      <th>Email</th>
+    </tr>
+  </table>  
+  
+  <div class="down">Designed and Hosted by Andy250</div>
+  
+  </body>
+</html>
