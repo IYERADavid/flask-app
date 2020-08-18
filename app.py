@@ -129,7 +129,10 @@ def questions():
         subject = session.get("subject_name",None)
         url1 = "https://questions.aloc.ng/api/q/1?subject="
         url = url1 + language
-        req = requests.get(url)
+        try:
+            req = requests.get(url)
+        except requests.exceptions.ConnectionError:
+            req = requests.get(url)
         res = req.json()
         language = res['data']
         # variable language contain list of question
