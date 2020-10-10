@@ -4,8 +4,7 @@ from flask import Flask ,render_template,url_for,request,redirect,flash,session,
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime 
 from operator import itemgetter
-from red import RegistrationForm,LoginForm,ResetForm,SubjectForm,AnswerForm
-import json  
+from forms import RegistrationForm,LoginForm,ResetForm,SubjectForm,AnswerForm  
 import ast
 
 
@@ -33,7 +32,7 @@ class Questions(db.Model):
     user_answers = db.Column(db.String(3), nullable=True)
     question = db.Column(db.String(1000000000000000000), nullable=False)
 
-class Marks(db. Model):
+class Marks(db.Model):
     mark_id =  db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
     questions_done = db.Column(db.Integer, nullable=False, default=0) 
@@ -58,7 +57,7 @@ def logout():
 @app.route('/answer',methods=['POST'])
 def answers():
     if not g.user_id:
-        flash(message="You must Login or Singup")
+        flash(message="You must Login or Signup")
         return redirect(url_for('login'))
     elif request.method == 'GET':
         flash(message="DO the question to get the answer")
@@ -69,6 +68,7 @@ def answers():
         current_user = verify_user_login.user_id
         if form.validate_on_submit() and current_user == session.get('user_id',None):
             user_answer= form.answer.data
+            user_answer= user_answer.lower()
             subject = form.subject_name.data 
             question_id = form.question_id.data
             user_id = session.get('user_id',None)
@@ -109,14 +109,14 @@ def answers():
             flash(message="{}".format(error))
             return render_template('questions.html',language=language ,question_id=question_id ,form=form)
         else:
-            flash(message="Hey you can't continue becouse another user logged in on your device ( Now everything done from here it is for another user who logged in )")
-            return redirect(url_for('home_page'))
+            flash(message="you must login again becouse we have dropped your session")
+            return redirect(url_for('login'))
 
 
 @app.route('/questions',methods=['GET','POST'])
 def questions():
     if not g.user_id:
-        flash(message="You must Login or Singup")
+        flash(message="You must Login or Signup")
         return redirect(url_for('login'))
     elif request.method == 'GET' and not session.get('subject_name',None):
         flash(message="You must choose a subject to get a question")
@@ -158,7 +158,7 @@ def questions():
 @app.route('/subjects',methods=['GET','POST'])
 def subject_list():
     if not g.user_id:
-        flash(message="You must Login or Singup")
+        flash(message="You must Login or Signup")
         return redirect(url_for('login'))
     else:
         form = SubjectForm()
@@ -228,7 +228,7 @@ def login():
 @app.route('/',methods=['GET','POST'])
 def home_page():
     if not g.user_id:
-        flash(message="You must Login or Singup")
+        flash(message="You must Login or Signup")
         return redirect(url_for('login'))
     return render_template('home.html')
 

@@ -12,7 +12,7 @@ class RegistrationForm(FlaskForm):
     user_email = StringField('email',validators=[InputRequired(), email()])
     user_password = PasswordField('password',validators=[InputRequired()])
     user_confirm_password = PasswordField('user_confirm password',validators=[InputRequired(), EqualTo('user_password',message='you entered diffirent password')])
-    submit = SubmitField('SING UP')
+    submit = SubmitField('SIGN UP')
 
 
 class LoginForm(FlaskForm):
@@ -37,8 +37,8 @@ class SubjectForm(FlaskForm):
 
 
 class AnswerForm(FlaskForm):
-    subject_name = HiddenField('', render_kw={'id':'5675','value':'subject'})
+    subject_name = HiddenField('', render_kw={'id':'5675','value':'that'})
     question_id = HiddenField('', render_kw={'id':'2342','value':'0'})
-    answer = StringField('your answer',validators=[InputRequired(), AnyOf(values=['a','b','c','d'])])
+    answer = StringField('your answer',validators=[InputRequired(), AnyOf(values=['a','b','c','d','A','B','C','D'])])
     submit = SubmitField('submit', render_kw={"onclick": "questions_id()"})
   
