@@ -1,3 +1,4 @@
+import os
 import requests
 import json
 from flask import Flask ,render_template,url_for,request,redirect,flash,session,g
@@ -6,11 +7,13 @@ from datetime import datetime
 from operator import itemgetter
 from forms import RegistrationForm,LoginForm,ResetForm,SubjectForm,AnswerForm  
 import ast
+from dotenv import load_dotenv
 
 
+load_dotenv()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] ='DAVIDfhghgjfeiddidjfggndsvnbvxmmqwie337f'
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 
@@ -132,7 +135,21 @@ def questions():
         try:
             req = requests.get(url)
         except requests.exceptions.ConnectionError:
-            req = requests.get(url)
+            flash("Error connecting to the server. Please try again later.")
+            return redirect(url_for('subject_list'))
+        except requests.exceptions.Timeout:
+            flash("The request timed out. Please check your connection and try again.")
+            return redirect(url_for('subject_list'))
+        except requests.exceptions.HTTPError as e:
+            flash(f"HTTP error occurred: {e}")
+            return redirect(url_for('subject_list'))
+        except requests.exceptions.RequestException as e:
+            flash(f"An error occurred: {e}")
+            return redirect(url_for('subject_list'))
+        except ValueError:
+            flash("Invalid response received from the server.")
+            return redirect(url_for('subject_list'))
+
         res = req.json()
         language = res['data']
         # variable language contain list of question
