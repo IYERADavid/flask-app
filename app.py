@@ -254,5 +254,6 @@ def andrews_page():
     if request.method == 'GET':
         return render_template('index.html')
 
+port = os.getenv('FLASK_PORT', 8080)  # Default to 8080 if not set
 if __name__ == "__main__":
-    app.run(debug=True)    
+    app.run(debug=True, host='0.0.0.0', port=int(port))
