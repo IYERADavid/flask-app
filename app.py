@@ -63,7 +63,7 @@ def answers():
         flash(message="You must Login or Signup")
         return redirect(url_for('login'))
     elif request.method == 'GET':
-        flash(message="DO the question to get the answer")
+        flash(message="please select a subject")
         return redirect(url_for('subject_list'))        
     else:
         form = AnswerForm()
@@ -89,18 +89,17 @@ def answers():
                 language = add_user_answer.question
                 language = ast.literal_eval(language)
                 user_answer = add_user_answer.user_answers
-                for item in language:
-                    answer = item[u'answer']
-                    if answer == user_answer:
-                        update_marks = Marks.query.filter_by(user_id=user_id).first()
-                        update_marks.points += 1
-                        db.session.commit() 
-                        score = update_marks.points
-                    else:
-                        update_marks = Marks.query.filter_by(user_id=user_id).first()
-                        score = update_marks.points
+                answer = language[u'answer']
+                if answer == user_answer:
+                    update_marks = Marks.query.filter_by(user_id=user_id).first()
+                    update_marks.points += 1
+                    db.session.commit() 
+                    score = update_marks.points
+                else:
+                    update_marks = Marks.query.filter_by(user_id=user_id).first()
+                    score = update_marks.points
             flash(message="Answer for {} question ".format(subject))
-            return render_template('answers.html',language=language,user_answer=user_answer,question_id=question_id,
+            return render_template('answers.html',question_data=language,user_answer=user_answer,question_id=question_id,
             question_done=question_done,score=score,user_name=user_name)
         elif not form.validate_on_submit() and current_user == session.get('user_id',None):
             form = AnswerForm()
@@ -110,7 +109,7 @@ def answers():
             language = ast.literal_eval(language)
             error = "Your answer must be one of this a,b,c or d"
             flash(message="{}".format(error))
-            return render_template('questions.html',language=language ,question_id=question_id ,form=form)
+            return render_template('questions.html',question_data=language ,question_id=question_id ,form=form)
         else:
             flash(message="you must login again becouse we have dropped your session")
             return redirect(url_for('login'))
@@ -126,14 +125,18 @@ def questions():
         return redirect(url_for('subject_list'))
     else:    
         form = AnswerForm()
-        language = session.get('subject_name',None)
-        #print(language)
-        language = language.lower()
-        subject = session.get("subject_name",None)
-        url1 = "https://questions.aloc.ng/api/q/1?subject="
-        url = url1 + language
+
+        subject_name = session.get('subject_name',None)
+        aloc_base_url = "https://questions.aloc.com.ng/api/v2/q?subject="
+        aloc_question_url = aloc_base_url + subject_name.lower()
+        request_headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'AccessToken': os.getenv('ALOC_ACCESS_KEY'),
+        }
+
         try:
-            req = requests.get(url)
+            req = requests.get(aloc_question_url, headers=request_headers )
         except requests.exceptions.ConnectionError:
             flash("Error connecting to the server. Please try again later.")
             return redirect(url_for('subject_list'))
@@ -151,26 +154,21 @@ def questions():
             return redirect(url_for('subject_list'))
 
         res = req.json()
-        language = res['data']
-        # variable language contain list of question
+        # this is the retrieved question from the Aloc api
+        question_data = str(res['data'])
         user_id = session.get('user_id',None)
-        # user_id contain the id of the use who logged in
-        language = str(language)
-        question = Questions(user_id= user_id ,question= language)
-        # i added user_id and list of question to database
-        # i have set question_id to be primary key 
+        question = Questions(user_id= user_id ,question= question_data)
+
         db.session.add(question)
         db.session.commit()
+
         question_id = question.question_id
-        #print (question_id)
         get_question = Questions.query.filter_by(question_id=question_id).first()
-        language = get_question.question
-        language = ast.literal_eval(language)
-        for item in language:
-            answer = item['answer']
-            print(answer)
-        flash(message="Welcome to {} question".format(subject))
-        return render_template('questions.html',language=language ,question_id=question_id ,form=form,subject=subject)
+        question_data = get_question.question
+        question_data = ast.literal_eval(question_data)
+
+        flash(message="Welcome to {} question".format(subject_name))
+        return render_template('questions.html',question_data=question_data ,question_id=question_id ,form=form,subject=subject_name)
 
 @app.route('/subjects',methods=['GET','POST'])
 def subject_list():

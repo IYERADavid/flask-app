@@ -24,20 +24,19 @@
 {% block body %}
 <p class="home"><a href="{{url_for('home_page')}}">Home</a></p>
 
-{% for item in language %}
     <p>"question_id":{{question_id}}</p>
-    {% if item.section %}
-        <p>section: {{item.section}}</p>
+    {% if question_data.section %}
+        <p>section: {{question_data.section}}</p>
     {% endif %}
-    {% if item.image %}
-    <img src='{{item.image}}'/>
+    {% if question_data.image %}
+    <img src='{{question_data.image}}'/>
     {% endif %}
-    <p>question: {{item.question}}</p>
+    <p>question: {{question_data.question}}</p>
     <p>options:</p>
-    <p>a){{item.option.a}}</p>
-    <p>b){{item.option.b}}</p>
-    <p>c){{item.option.c}}</p>
-    <p>d){{item.option.d}}</p>
+    <p>a){{question_data.option.a}}</p>
+    <p>b){{question_data.option.b}}</p>
+    <p>c){{question_data.option.c}}</p>
+    <p>d){{question_data.option.d}}</p>
     <form method="POST" action="/answer">
         {{form.csrf_token}}
         {{form.subject_name()}}
@@ -53,6 +52,5 @@
         </p>         
         <span>{{form.submit()}}</span>
     </form>
-{% endfor %}
     <p style="text-align: center;padding-left: 520px;"><a href="{{url_for('subject_list')}}">SubJect</a></p>
 {% endblock %}
