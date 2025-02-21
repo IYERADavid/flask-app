@@ -13,30 +13,29 @@
 
 {% block body %}
 <p class="home"><a href="{{url_for('home_page')}}">Home</a></p>
-{% for item in language %}
     <p>"answer_id":{{question_id}}</p>
-    {% if item.section %}
-        <p>section: {{item.section}}</p>
+    {% if question_data.section %}
+        <p>section: {{question_data.section}}</p>
     {% endif %}
-    {% if item.image %}
-        <img src='{{item.image}}'/>
+    {% if question_data.image %}
+        <img src='{{question_data.image}}'/>
     {% endif %}
-    <p>quesion: {{item.question}}</p>
+    <p>quesion: {{question_data.question}}</p>
     <p>options:</p>
-    <p>a){{item.option.a}}</p>
-    <p>b){{item.option.b}}</p>
-    <p>c){{item.option.c}}</p>
-    <p>d){{item.option.d}}</p>
-    <h4>correct answer is {{item.answer}}</h4>
+    <p>a){{question_data.option.a}}</p>
+    <p>b){{question_data.option.b}}</p>
+    <p>c){{question_data.option.c}}</p>
+    <p>d){{question_data.option.d}}</p>
+    <h4>correct answer is {{question_data.answer}}</h4>
     <p>your answer is {{user_answer}}</p>
-    {% if item.answer == user_answer %}
+    {% if question_data.answer == user_answer %}
         <p class="yes" style="background-color: green;">your answer is correct</p>
     {% else %}
         <p class="no" style="background-color: red;">your answer is wrong</p>
     {% endif %}
-    {% if item.solution %}
+    {% if question_data.solution %}
         <p style="text-decoration: underline;">solution of the above questions is:</p>
-        <p>solution: {{item.solution}}</p>
+        <p>solution: {{question_data.solution}}</p>
     {% endif %}
     <table border="1">
         <tr><th colspan="2">{{user_name}}'s mark table</th></tr>
@@ -51,6 +50,5 @@
     </table>
     <span><button><a href="{{url_for('questions')}}">Get another question</a></button></span>
     <a style="float: right;padding-right: 200px;" href="{{url_for('subject_list')}}">SubJects</a>
-{% endfor %}
 
 {% endblock %}   
