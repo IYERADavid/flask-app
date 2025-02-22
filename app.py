@@ -67,30 +67,29 @@ def answers():
         return redirect(url_for('subject_list'))        
     else:
         form = AnswerForm()
-        verify_user_login = Questions.query.filter_by(question_id=form.question_id.data).first()
-        current_user = verify_user_login.user_id
-        if form.validate_on_submit() and current_user == session.get('user_id',None):
+        current_question = Questions.query.filter_by(question_id=form.question_id.data).first()
+        current_user_id = current_question.user_id
+        if form.validate_on_submit() and current_user_id == session.get('user_id',None):
             user_answer= form.answer.data
             user_answer= user_answer.lower()
             subject = form.subject_name.data 
             question_id = form.question_id.data
             user_id = session.get('user_id',None)
-            get_user_name = User.query.filter_by(id=user_id).first()
-            user_name = get_user_name.user_second_name
-            #print(question_id)
-            update_questions = Marks.query.filter_by(user_id=user_id).first()
+            user_data = User.query.filter_by(id=user_id).first()
+            user_name = user_data.user_second_name
+            user_question_status = Marks.query.filter_by(user_id=user_id).first()
             if user_answer:
-                update_questions.questions_done += 1
+                user_question_status.questions_done += 1
                 db.session.commit()
-                question_done = update_questions.questions_done
-                add_user_answer = Questions.query.filter_by(question_id=question_id).first()
-                add_user_answer.user_answers = user_answer
+                question_done = user_question_status.questions_done
+                user_completed_question = current_question
+                user_completed_question.user_answers = user_answer
                 db.session.commit()
-                language = add_user_answer.question
-                language = ast.literal_eval(language)
-                user_answer = add_user_answer.user_answers
-                answer = language[u'answer']
-                if answer == user_answer:
+                question_data = user_completed_question.question
+                question_data = ast.literal_eval(question_data)
+                user_answer = user_completed_question.user_answers
+                correct_answer = question_data[u'answer']
+                if correct_answer == user_answer:
                     update_marks = Marks.query.filter_by(user_id=user_id).first()
                     update_marks.points += 1
                     db.session.commit() 
@@ -99,17 +98,17 @@ def answers():
                     update_marks = Marks.query.filter_by(user_id=user_id).first()
                     score = update_marks.points
             flash(message="Answer for {} question ".format(subject))
-            return render_template('answers.html',question_data=language,user_answer=user_answer,question_id=question_id,
+            return render_template('answers.html',question_data=question_data,user_answer=user_answer,question_id=question_id,
             question_done=question_done,score=score,user_name=user_name)
-        elif not form.validate_on_submit() and current_user == session.get('user_id',None):
+        elif not form.validate_on_submit() and current_user_id == session.get('user_id',None):
             form = AnswerForm()
             question_id = form.question_id.data
-            get_question = Questions.query.filter_by(question_id=question_id).first()
-            language = get_question.question
-            language = ast.literal_eval(language)
+            get_question = current_question
+            question_data = get_question.question
+            question_data = ast.literal_eval(question_data)
             error = "Your answer must be one of this a,b,c or d"
             flash(message="{}".format(error))
-            return render_template('questions.html',question_data=language ,question_id=question_id ,form=form)
+            return render_template('questions.html',question_data=question_data ,question_id=question_id ,form=form)
         else:
             flash(message="you must login again becouse we have dropped your session")
             return redirect(url_for('login'))
